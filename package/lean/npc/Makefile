@@ -25,7 +25,7 @@ endif
 ifeq ($(ARCH),arm)
 	NPC_ARCH:=arm_v7
 	ifeq ($(BOARD),bcm53xx)
-		NPC_ARCH:=arm_v6
+		NPC_ARCH:=arm_v5
   endif
 	ifeq ($(BOARD),kirkwood)
 		NPC_ARCH:=arm_v5
@@ -44,8 +44,6 @@ PKG_HASH:=skip
 
 include $(INCLUDE_DIR)/package.mk
 
-PKG_UNPACK:=$(HOST_TAR) -C $(PKG_BUILD_DIR) -xzf $(DL_DIR)/$(PKG_SOURCE)
-
 define Package/$(PKG_NAME)
 	SECTION:=net
 	CATEGORY:=Network
@@ -61,7 +59,7 @@ npc is a fast reverse proxy to help you expose a local server behind a NAT or fi
 endef
 
 define Build/Prepare
-	$(PKG_UNPACK)
+	tar -zxf $(DL_DIR)/$(PKG_SOURCE) -C $(PKG_BUILD_DIR)
 endef
 
 define Build/Configure
