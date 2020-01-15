@@ -22,6 +22,7 @@ PKG_LICENSE_FILES:=LICENSE libtomcrypt/LICENSE libtommath/LICENSE
 PKG_CPE_ID:=cpe:/a:matt_johnston:dropbear_ssh_server
 
 PKG_BUILD_PARALLEL:=1
+PKG_ASLR_PIE_REGULAR:=1
 PKG_USE_MIPS16:=0
 PKG_FIXUP:=autoreconf
 
@@ -72,6 +73,7 @@ define Package/dropbearconvert
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Utility for converting SSH keys
+  DEPENDS:= +DROPBEAR_ZLIB:zlib
 endef
 
 CONFIGURE_ARGS += \

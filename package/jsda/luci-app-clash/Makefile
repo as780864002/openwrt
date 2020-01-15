@@ -1,8 +1,7 @@
 include $(TOPDIR)/rules.mk 
 
 PKG_NAME:=luci-app-clash
-PKG_VERSION:=1.4.1
-#PKG_RELEASE:=3
+PKG_VERSION:=1.4.5
 PKG_MAINTAINER:=frainzy1477
 
 
@@ -13,7 +12,7 @@ define Package/luci-app-clash
 	CATEGORY:=LuCI
 	SUBMENU:=3. Applications
 	TITLE:=LuCI app for clash
-	DEPENDS:=+luci +luci-base +clash +wget +iptables +coreutils-base64 +coreutils +coreutils-nohup +bash +ipset +libustream-openssl +libopenssl +openssl-util
+	DEPENDS:=+luci +luci-base +wget +iptables +coreutils-base64 +coreutils +coreutils-nohup +bash +ipset +libustream-openssl +libopenssl +openssl-util +kmod-tun
 	PKGARCH:=all
 	MAINTAINER:=frainzy1477
 endef
@@ -22,11 +21,9 @@ define Package/luci-app-clash/description
 	Luci Interface for clash.
 endef
 
-
 define Build/Prepare
 	chmod 777 -R ${CURDIR}/tools/po2lmo
 	${CURDIR}/tools/po2lmo/src/po2lmo ${CURDIR}/po/zh-cn/clash.po ${CURDIR}/po/zh-cn/clash.zh-cn.lmo
-
 endef
 
 define Build/Configure
@@ -37,6 +34,8 @@ endef
 
 define Package/$(PKG_NAME)/preinst
 #!/bin/sh
+
+[ -z "$${IPKG_INSTROOT}" ] && exit 0
 
 mkdir -p /usr/share/clashbackup 2>/dev/null
 
@@ -64,7 +63,6 @@ if [ -f /usr/share/clash/new_core_version ]; then
 	rm -rf /usr/share/clash/new_core_version 2>/dev/null
 fi
 
-
 if [ -f /usr/share/clash/new_clashr_core_version ]; then
 	rm -rf /usr/share/clash/new_clashr_core_version 2>/dev/null
 fi
@@ -89,12 +87,13 @@ if [  -f /usr/share/clash/config/custom/config.yaml ];then
 	mv /usr/share/clash/config/custom/config.yaml /usr/share/clashbackup/config.bak3 2>/dev/null
 fi
 
-
-
 endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
+
+[ -z "$${IPKG_INSTROOT}" ] && exit 0
+
 rm -rf /tmp/luci*  
 
 if [ -f "/etc/config/clash.bak" ]; then
@@ -117,6 +116,7 @@ if [ -f "/etc/init.d/clash" ]; then
 	/etc/init.d/clash disable 2>/dev/null
 fi
 
+mkdir -p /etc/clash/clashtun 2>/dev/null
 endef
 
 define Package/$(PKG_NAME)/install
@@ -158,6 +158,9 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./root/usr/share/clash/core_download.sh $(1)/usr/share/clash/
 	$(INSTALL_BIN) ./root/usr/share/clash/proxy.sh $(1)/usr/share/clash/
 	$(INSTALL_BIN) ./root/usr/share/clash/dns.yaml $(1)/usr/share/clash/
+	$(INSTALL_BIN) ./root/usr/share/clash/tundns_1.yaml $(1)/usr/share/clash/
+	$(INSTALL_BIN) ./root/usr/share/clash/tundns_2.yaml $(1)/usr/share/clash/
+	$(INSTALL_BIN) ./root/usr/share/clash/tundns_3.yaml $(1)/usr/share/clash/
 	$(INSTALL_BIN) ./root/usr/share/clash/custom_rule.yaml $(1)/usr/share/clash/
 	$(INSTALL_BIN) ./root/usr/share/clash/luci_version $(1)/usr/share/clash/
 	$(INSTALL_BIN) ./root/usr/share/clash/check_luci_version.sh $(1)/usr/share/clash/
@@ -174,19 +177,16 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./root/usr/share/clash/clash.txt $(1)/tmp/
 
 	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/index.html $(1)/usr/share/clash/dashboard/
-	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/main.d6bae0fbee6ba95bd65b.css $(1)/usr/share/clash/dashboard/
+	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/main.0bddb85299f970595cb5.css $(1)/usr/share/clash/dashboard/
 	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/img/33343e6117c37aaef8886179007ba6b5.png $(1)/usr/share/clash/dashboard/img/
-	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/js/1.bundle.d6bae0fbee6ba95bd65b.min.js $(1)/usr/share/clash/dashboard/js/
-	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/js/bundle.d6bae0fbee6ba95bd65b.min.js $(1)/usr/share/clash/dashboard/js/
+	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/js/1.bundle.0bddb85299f970595cb5.min.js $(1)/usr/share/clash/dashboard/js/
+	$(INSTALL_BIN) ./root/usr/share/clash/dashboard/js/bundle.0bddb85299f970595cb5.min.js $(1)/usr/share/clash/dashboard/js/
         
 	$(INSTALL_DATA) ./luasrc/clash.lua $(1)/usr/lib/lua/luci/
 	$(INSTALL_DATA) ./luasrc/controller/*.lua $(1)/usr/lib/lua/luci/controller/
 	$(INSTALL_DATA) ./luasrc/model/cbi/clash/*.lua $(1)/usr/lib/lua/luci/model/cbi/clash/
 	$(INSTALL_DATA) ./luasrc/view/clash/* $(1)/usr/lib/lua/luci/view/clash/
 	$(INSTALL_DATA) ./po/zh-cn/clash.zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/
-	
 endef
-
-
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
