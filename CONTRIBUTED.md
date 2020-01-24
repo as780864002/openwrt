@@ -22,7 +22,7 @@ luci-theme-darkmatter source: [apollo-ng/luci-theme-darkmatter](https://github.c
 luci-app-koolproxyR source: [Ameykyl/luci-app-koolproxyR](https://github.com/Ameykyl/luci-app-koolproxyR).<br/>
 openwrt-chinadns-ng source: [pexcn/openwrt-chinadns-ng](https://github.com/pexcn/openwrt-chinadns-ng).<br/>
 luci-app-ssr-plus-Jo source: [Leo-Jo-My/luci-app-ssr-plus-Jo](https://github.com/Leo-Jo-My/luci-app-ssr-plus-Jo).<br/>
-openwrt-udpspeeder source: [pexcn/openwrt-udpspeeder](https://github.com/pexcn/openwrt-udpspeeder).<br/>
+openwrt-udpspeeder source: [zhfreal/openwrt-UDPspeeder](https://github.com/zhfreal/openwrt-UDPspeeder).<br/>
 luci-app-onliner source: [rufengsuixing/luci-app-onliner](https://github.com/rufengsuixing/luci-app-onliner).<br/>
 luci-app-dockerman source: [lisaac/luci-app-dockerman](https://github.com/lisaac/luci-app-dockerman).<br/>
 luci-lib-docker source: [lisaac/luci-lib-docker](https://github.com/lisaac/luci-lib-docker).<br/>
@@ -32,7 +32,9 @@ luci-app-adguardhome source: [rufengsuixing/luci-app-adguardhome](https://github
 Rclone-OpenWrt source: [ElonH/Rclone-OpenWrt](https://github.com/ElonH/Rclone-OpenWrt).<br/>
 luci-app-usb3disable source: [rufengsuixing/luci-app-usb3disable](https://github.com/rufengsuixing/luci-app-usb3disable).<br/>
 luci-app-vssr source: [jerrykuku/luci-app-vssr](https://github.com/jerrykuku/luci-app-vssr).<br/>
-luci-app-diskman source: [lisaac/luci-app-diskman](https://github.com/lisaac/luci-app-diskman).
+luci-app-diskman source: [lisaac/luci-app-diskman](https://github.com/lisaac/luci-app-diskman).<br/>
+NanoPi R1s(h5) support: [jerrykuku/openwrt-nanopi-r1s-h5](https://github.com/jerrykuku/openwrt-nanopi-r1s-h5).<br/>
+NanoPi support: [speedyworldclub/nlede](https://github.com/speedyworldclub/nlede).
 
 ## License
 ### Depending on their own License.

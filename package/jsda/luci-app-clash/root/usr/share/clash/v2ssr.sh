@@ -1,6 +1,25 @@
-#!/bin/sh /etc/rc.common
+#!/bin/bash /etc/rc.common
 
 
+config_name=$(uci get clash.config.config_name 2>/dev/null)
+REAL_LOG="/usr/share/clash/clash_real.txt"
+lang=$(uci get luci.main.lang 2>/dev/null)
+ 
+ 
+check_name=$(grep -F "${config_name}.yaml" "/usr/share/clashbackup/confit_list.conf")
+if [ ! -z $check_name ];then
+   
+	if [ $lang == "en" ] || [ $lang == "auto" ];then
+				echo "Config with same name exist, please rename and download again" >$REAL_LOG
+	elif [ $lang == "zh_cn" ];then
+				echo "已存在同名配置，请重命名名配置重新下载" >$REAL_LOG
+	fi
+	sleep 5
+	echo "Clash for OpenWRT" >$REAL_LOG
+	exit 0	
+
+   
+else
 	
 	#awk '/config groups/,/##end/{print}' /etc/config/clashh 2>/dev/null >/usr/share/clash/v2ssr/config.bak 2>&1
 
@@ -576,7 +595,7 @@ config_type=$(uci get clash.config.config_type 2>/dev/null)
 	
 CONFIG_YAML_RULE="/usr/share/clash/v2ssr/v2ssr_custom_rule.yaml"
 SERVER_FILE="/tmp/servers.yaml"
-CONFIG_YAML="/usr/share/clash/config/sub/config.yaml"
+CONFIG_YAML="/usr/share/clash/config/sub/${config_name}.yaml"
 TEMP_FILE="/tmp/dns_temp.yaml"
 Proxy_Group="/tmp/Proxy_Group"
 GROUP_FILE="/tmp/groups.yaml"
@@ -887,13 +906,11 @@ cat $SERVER_FILE >> $TEMP_FILE  2>/dev/null
 
 cat $GROUP_FILE >> $TEMP_FILE 2>/dev/null
 
-if [ -f $CONFIG_YAML ];then
-	rm -rf $CONFIG_YAML
-fi
-
 cat $TEMP_FILE $CONFIG_YAML_RULE > $CONFIG_YAML 2>/dev/null
 
 sed -i "/Rule:/i\     " $CONFIG_YAML 2>/dev/null
+
+echo "${config_name}.yaml#$subscribe_url#$subtype" >>/usr/share/clashbackup/confit_list.conf
 
 rm -rf $TEMP_FILE $GROUP_FILE $Proxy_Group $CONFIG_FILE
 
@@ -921,4 +938,5 @@ fi
 	
 fi
 rm -rf $SERVER_FILE
+fi
 
