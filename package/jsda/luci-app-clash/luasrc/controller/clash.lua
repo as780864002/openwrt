@@ -14,10 +14,15 @@ function index()
 	entry({"admin", "services", "clash"},alias("admin", "services", "clash", "overview"), _("Clash"), 10).dependent = false
 	entry({"admin", "services", "clash", "overview"},cbi("clash/overview"),_("Overview"), 10).leaf = true
 	entry({"admin", "services", "clash", "client"},cbi("clash/client"),_("Client"), 20).leaf = true
+
+	entry({"admin", "services", "clash", "import"},cbi("clash/import"),_("Import Config"), 25).leaf = true
+
+	entry({"admin", "services", "clash", "config"},cbi("clash/config"),_("Config"), 30).leaf = true
+
 	entry({"admin", "services", "clash", "create"},cbi("clash/create"),_("Create Config"), 40).leaf = true
-        entry({"admin", "services", "clash", "servers-config"},cbi("clash/servers-config"), nil).leaf = true
+    entry({"admin", "services", "clash", "servers-config"},cbi("clash/servers-config"), nil).leaf = true
 	entry({"admin", "services", "clash", "provider-config"},cbi("clash/provider-config"), nil).leaf = true
-        entry({"admin", "services", "clash", "groups"},cbi("clash/groups"), nil).leaf = true
+    entry({"admin", "services", "clash", "groups"},cbi("clash/groups"), nil).leaf = true
 
 	entry({"admin", "services", "clash", "settings"}, firstchild(),_("Settings"), 50)
 	entry({"admin", "services", "clash", "settings", "port"},cbi("clash/port"),_("Proxy Ports"), 60).leaf = true
@@ -26,16 +31,8 @@ function index()
 	entry({"admin", "services", "clash", "settings", "list"},cbi("clash/list"),_("Custom List"), 90).leaf = true
 
 	entry({"admin", "services", "clash", "settings", "grules"},cbi("clash/game-settings"),_("Game Rules"), 91).dependent = false
-        entry({"admin", "services", "clash", "g-rules"},cbi("clash/game-rule"), nil).leaf = true
-	--entry({"admin", "services", "clash", "g-groups"},cbi("clash/game-groups"), nil).leaf = true
+    entry({"admin", "services", "clash", "g-rules"},cbi("clash/game-rule"), nil).leaf = true
 
-			
-	entry({"admin", "services", "clash", "config"},firstchild(),_("Config"), 30)
-	entry({"admin", "services", "clash", "config", "actconfig"},cbi("clash/actconfig"),_("Config In Use"), 110).leaf = true
-	entry({"admin", "services", "clash", "config", "subconfig"},cbi("clash/subconfig"),_("Subscribe Config"), 120).leaf = true
-	entry({"admin", "services", "clash", "config", "upconfig"},cbi("clash/upconfig"),_("Uploaded Config"), 130).leaf = true
-	entry({"admin", "services", "clash", "config", "cusconfig"},cbi("clash/cusconfig"),_("Custom Config"), 140).leaf = true
-	
 	entry({"admin","services","clash","status"},call("action_status")).leaf=true
 	entry({"admin", "services", "clash", "log"},cbi("clash/log"),_("Log"), 150).leaf = true
 	entry({"admin", "services", "clash", "update"},cbi("clash/update"),_("Update"), 160).leaf = true
@@ -90,9 +87,9 @@ local function in_use()
 end
 
 
-local function subconf()
-	if nixio.fs.access(string.sub(luci.sys.exec("uci get clash.config.config_path_sub"), 1, -2)) then
-	return fss.basename(string.sub(luci.sys.exec("uci get clash.config.config_path_sub"), 1, -2))
+local function conf_path()
+	if nixio.fs.access(string.sub(luci.sys.exec("uci get clash.config.use_config"), 1, -2)) then
+	return fss.basename(string.sub(luci.sys.exec("uci get clash.config.use_config"), 1, -2))
 	else
 	return ""
 	end
@@ -100,30 +97,17 @@ end
 
 
 
-local function upconf()
-	if nixio.fs.access(string.sub(luci.sys.exec("uci get clash.config.config_path_up"), 1, -2)) then
-	return fss.basename(string.sub(luci.sys.exec("uci get clash.config.config_path_up"), 1, -2))
-	else
-	return ""
-	end
-
+local function typeconf()
+	return luci.sys.exec("uci get clash.config.config_type")
 end
 
-local function cusconf()
-	if nixio.fs.access(string.sub(luci.sys.exec("uci get clash.config.config_path_cus"), 1, -2)) then
-	return fss.basename(string.sub(luci.sys.exec("uci get clash.config.config_path_cus"), 1, -2))
-	else
-	return ""
-	end
-
-end
 
 function action_conf()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
-	subconf = subconf(),
-	upconf = upconf(),
-	cusconf = cusconf(),
+	conf_path = conf_path(),
+	typeconf = typeconf()
+
 	})
 end
 
@@ -204,13 +188,21 @@ local function clashr_core()
 	end
 end
 
+
 local function clashtun_core()
 	if nixio.fs.access("/etc/clash/clashtun/clash") then
-		return luci.sys.exec("/etc/clash/clashtun/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+		local tun=luci.sys.exec("/etc/clash/clashtun/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+		if tun ~= "" then
+			return luci.sys.exec("/etc/clash/clashtun/clash -v 2>/dev/null |awk -F ' ' '{print $2}'")
+		else 
+			return luci.sys.exec("sed -n 1p /usr/share/clash/tun_version")
+		end
 	else
 		return "0"
 	end
 end
+
+
 
 local function readlog()
 	return luci.sys.exec("sed -n '$p' /usr/share/clash/clash_real.txt 2>/dev/null")
@@ -278,8 +270,9 @@ function check_status()
 		clashtun_core = clashtun_core(),
 		new_core_version = new_core_version(),
 		new_clashtun_core_version =new_clashtun_core_version(),
-		check_clashtun_core = check_clashtun_core()
-		
+		check_clashtun_core = check_clashtun_core(),
+		conf_path = conf_path(),
+		typeconf = typeconf()	
 	})
 end
 function action_status()
@@ -295,7 +288,10 @@ function action_status()
 		dash_pass = dash_pass(),
 		clashtun_core = clashtun_core(),
 		e_mode = e_mode(),
-		in_use = in_use()
+		in_use = in_use(),
+		conf_path = conf_path(),
+		typeconf = typeconf()
+
 
 
 	})
@@ -322,10 +318,12 @@ function do_update()
 end
 
 function do_start()
+	luci.sys.exec('uci set clash.config.enable="1" && uci commit clash')
 	luci.sys.exec("/etc/init.d/clash restart 2>&1 &")
 end
 
 function do_stop()
+	luci.sys.exec('uci set clash.config.enable="0" && uci commit clash')
 	luci.sys.exec("/etc/init.d/clash stop 2>&1 &")
 end
 
