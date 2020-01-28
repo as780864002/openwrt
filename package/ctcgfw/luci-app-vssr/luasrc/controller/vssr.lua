@@ -6,49 +6,47 @@ function index()
     if not nixio.fs.access("/etc/config/vssr") then return end
 
     if nixio.fs.access("/usr/bin/ssr-redir") then
-        entry({"admin", "services", "vssr"},
-              alias("admin", "services", "vssr", "client"), _("vssr"), 10).dependent =
+	entry({"admin", "vpn"}, firstchild(), "VPN", 45).dependent = false
+        entry({"admin", "vpn", "vssr"},
+              alias("admin", "vpn", "vssr", "client"), _("vssr"), 10).dependent =
             true -- 首页
-        entry({"admin", "services", "vssr", "client"}, cbi("vssr/client"),
+        entry({"admin", "vpn", "vssr", "client"}, cbi("vssr/client"),
               _("SSR Client"), 10).leaf = true -- 基本设置
-        entry({"admin", "services", "vssr", "servers"}, cbi("vssr/servers"),
-              _("Severs Nodes"), 11).leaf = true -- 服务器节点
-        entry({"admin", "services", "vssr", "servers"},
+        entry({"admin", "vpn", "vssr", "servers"}, cbi("vssr/servers"),
+              _("Node List"), 11).leaf = true -- 服务器节点
+        entry({"admin", "vpn", "vssr", "servers"},
               arcombine(cbi("vssr/servers"), cbi("vssr/client-config")),
-              _("Severs Nodes"), 11).leaf = true -- 编辑节点
-        entry({"admin", "services", "vssr", "control"}, cbi("vssr/control"),
-              _("Access Control"), 12).leaf = true -- 访问控制
-        if nixio.fs.access("/usr/bin/v2ray/v2ray") then
-            entry({"admin", "services", "vssr", "socks5"}, cbi("vssr/socks5"),
-                  _("Socks5"), 13).leaf = true -- Socks5代理
-        end
-        entry({"admin", "services", "vssr", "advanced"}, cbi("vssr/advanced"),
+              _("Node List"), 11).leaf = true -- 编辑节点
+entry({"admin", "vpn", "vssr", "subscription"},cbi("vssr/subscription"), _("Subscription"),12).leaf = true
+        entry({"admin", "vpn", "vssr", "control"}, cbi("vssr/control"),
+              _("Access Control"), 13).leaf = true -- 访问控制
+        entry({"admin", "vpn", "vssr", "advanced"}, cbi("vssr/advanced"),
               _("Advanced Settings"), 14).leaf = true -- 高级设置
     elseif nixio.fs.access("/usr/bin/ssr-server") then
-        entry({"admin", "services", "vssr"},
-              alias("admin", "services", "vssr", "server"), _("vssr"), 10).dependent =
+        entry({"admin", "vpn", "vssr"},
+              alias("admin", "vpn", "vssr", "server"), _("vssr"), 10).dependent =
             true
     else
         return
     end
 
     if nixio.fs.access("/usr/bin/ssr-server") then
-        entry({"admin", "services", "vssr", "server"},
+        entry({"admin", "vpn", "vssr", "server"},
               arcombine(cbi("vssr/server"), cbi("vssr/server-config")),
               _("SSR Server"), 20).leaf = true
     end
-
-    entry({"admin", "services", "vssr", "log"}, cbi("vssr/log"), _("Log"), 30).leaf =
+entry({"admin", "vpn", "vssr", "status"},form("vssr/status"),_("Status"), 23).leaf = true
+    entry({"admin", "vpn", "vssr", "log"}, cbi("vssr/log"), _("Log"), 30).leaf =
         true
 
-    entry({"admin", "services", "vssr", "refresh"}, call("refresh_data")) -- 更新白名单和GFWLIST
-    entry({"admin", "services", "vssr", "checkport"}, call("check_port")) -- 检测单个端口并返回Ping
-    entry({"admin", "services", "vssr", "run"}, call("act_status")) -- 检测全局服务器状态
-    entry({"admin", "services", "vssr", "change"}, call("change_node")) -- 切换节点
-    entry({"admin", "services", "vssr", "allserver"}, call("get_servers")) -- 获取所有节点Json
-    entry({"admin", "services", "vssr", "subscribe"}, call("get_subscribe")) -- 执行订阅
-    entry({"admin", "services", "vssr", "flag"}, call("get_flag")) -- 获取节点国旗 iso code
-    entry({"admin", "services", "vssr", "ip"}, call("check_ip")) -- 获取ip情况
+    entry({"admin", "vpn", "vssr", "refresh"}, call("refresh_data")) -- 更新白名单和GFWLIST
+    entry({"admin", "vpn", "vssr", "checkport"}, call("check_port")) -- 检测单个端口并返回Ping
+    entry({"admin", "vpn", "vssr", "run"}, call("act_status")) -- 检测全局服务器状态
+    entry({"admin", "vpn", "vssr", "change"}, call("change_node")) -- 切换节点
+    entry({"admin", "vpn", "vssr", "allserver"}, call("get_servers")) -- 获取所有节点Json
+    entry({"admin", "vpn", "vssr", "subscribe"}, call("get_subscribe")) -- 执行订阅
+    entry({"admin", "vpn", "vssr", "flag"}, call("get_flag")) -- 获取节点国旗 iso code
+    entry({"admin", "vpn", "vssr", "ip"}, call("check_ip")) -- 获取ip情况
 end
 
 -- 执行订阅
@@ -78,7 +76,8 @@ function get_subscribe()
         end
         luci.sys.call('uci commit vssr')
         luci.sys.call(
-            "nohup /usr/bin/lua /usr/share/vssr/subscribe.lua >/www/check_update.htm 2>/dev/null &")
+            "nohup /usr/share/vssr/subscribe.sh >/www/check_update.htm 2>/dev/null &")
+        
         e.error = 0
     else
         e.error = 1
@@ -118,7 +117,7 @@ function change_node()
     if sid ~= "" then
         uci:set("vssr", name, "global_server", sid)
         uci:commit("vssr")
-        luci.sys.call("/etc/init.d/vssr restart")
+     luci.sys.call("uci commit vssr && /etc/init.d/vssr restart")
         e.status = true
     end
     luci.http.prepare_content("application/json")
@@ -130,13 +129,18 @@ function act_status()
     math.randomseed(os.time())
     local e = {}
     -- 全局服务器
-    e.global = luci.sys.call(
-                   "busybox ps -w | grep vssr_t | grep -v grep >/dev/null") == 0
+   e.global=luci.sys.call("ps -w | grep ssr-retcp | grep -v grep >/dev/null") == 0 
     -- 检测PDNSD状态
     e.pdnsd = luci.sys.call("pidof pdnsd >/dev/null") == 0
     -- 检测游戏模式状态
-    e.game = luci.sys.call(
-                 "busybox ps -w | grep vssr_u | grep -v grep >/dev/null") == 0
+       e.game = false
+    if tonumber(luci.sys.exec("ps -w | grep ssr-reudp |grep -v grep| wc -l"))>0 then
+        e.game= true
+    else
+        if tonumber(luci.sys.exec("ps -w | grep ssr-retcp |grep \"\\-u\"|grep -v grep| wc -l"))>0 then
+            e.game= true
+        end
+    end
 
     -- 检测国外通道
     --[[    http=require("socket.http")
@@ -156,9 +160,32 @@ function act_status()
 	end
 	--]]
 
+   -- 检测国内通道
+    e.baidu = false
+    sret = luci.sys.call("/usr/bin/ssr-check www.baidu.com 80 3 1")
+    if sret == 0 then
+        e.baidu =  true
+    end
+    
+    -- 检测国外通道
+    e.google = false
+    sret = luci.sys.call("/usr/bin/ssr-check www.google.com 80 3 1")
+    if sret == 0 then
+        e.google =  true
+    end
+    
+
     -- 检测Socks5
-    e.socks5 = luci.sys.call(
-                   "busybox ps -w | grep vssr_s | grep -v grep >/dev/null") == 0
+   
+	if tonumber(luci.sys.exec("ps -w | grep ssr-local |grep -v grep| wc -l"))>0 then
+		e.socks5 = true
+	elseif tonumber(luci.sys.exec("ps -w | grep ss-local |grep -v grep| wc -l"))>0 then
+		e.socks5 = true
+	elseif tonumber(luci.sys.exec("ps -w | grep v2-ssr-local |grep -v grep| wc -l"))>0 then
+		e.socks5 = true
+                  elseif tonumber(luci.sys.exec("ps -w | grep trojan-ssr-local |grep -v grep| wc -l"))>0 then
+		e.socks5 = true
+	end    
 
     luci.http.prepare_content("application/json")
     luci.http.write_json(e)
@@ -315,7 +342,7 @@ function check_ip()
 
     result = luci.sys.exec("curl -s https://api.ip.sb/ip")
     if JudgeIPString(result) then
-        local cmd = '/usr/share/vssr/getip.sh ' .. result
+        local cmd = '/usr/share/vssr/getip.sh '..result
         e.outboard = result
         e.outboardip = luci.sys.exec(cmd)
     else
