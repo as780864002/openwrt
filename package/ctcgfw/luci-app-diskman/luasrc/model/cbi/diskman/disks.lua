@@ -1,11 +1,6 @@
 --[[
 LuCI - Lua Configuration Interface
 Copyright 2019 lisaac <https://github.com/lisaac/luci-app-diskman>
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-$Id$
 ]]--
 
 require "luci.util"
@@ -67,14 +62,6 @@ if dm.command.mdadm then
     r:option(DummyValue, "status", translate("Status"))
     r:option(DummyValue, "members_str", translate("Members"))
     r:option(DummyValue, "active", translate("Active"))
-    -- local redit = r:option(Button, "rpartition")
-    -- redit.inputstyle = "edit"
-    -- redit.inputtitle = "Edit"
-    -- redit.write = function(self, section)
-    --   local url = luci.dispatcher.build_url("admin/system/diskman/partition")
-    --   url = url .. "/" .. raid_devices[section].path:match("/dev/(.+)")
-    --   luci.http.redirect(url)
-    -- end
     r.extedit  = luci.dispatcher.build_url("admin/system/diskman/partition/%s")
   end
 end
@@ -82,13 +69,16 @@ end
 -- btrfs devices
 if dm.command.btrfs then
   btrfs_devices = dm.list_btrfs_devices()
-  local table_btrfs = m:section(Table, btrfs_devices, translate("Btrfs"))
-  table_btrfs:option(DummyValue, "uuid", translate("UUID"))
-  table_btrfs:option(DummyValue, "label", translate("Label"))
-  table_btrfs:option(DummyValue, "devices", translate("Devices"))
-  table_btrfs:option(DummyValue, "size_formated", translate("Size"))
-  table_btrfs:option(DummyValue, "used_formated", translate("Usage"))
-  table_btrfs.extedit  = luci.dispatcher.build_url("admin/system/diskman/btrfs/%s")
+  if next(btrfs_devices) ~= nil then
+    local table_btrfs = m:section(Table, btrfs_devices, translate("Btrfs"))
+    table_btrfs:option(DummyValue, "uuid", translate("UUID"))
+    table_btrfs:option(DummyValue, "label", translate("Label"))
+    table_btrfs:option(DummyValue, "members", translate("Members"))
+    -- sieze is error, since there is RAID
+    -- table_btrfs:option(DummyValue, "size_formated", translate("Size"))
+    table_btrfs:option(DummyValue, "used_formated", translate("Usage"))
+    table_btrfs.extedit  = luci.dispatcher.build_url("admin/system/diskman/btrfs/%s")
+  end
 end
 
 --tabs
@@ -212,11 +202,17 @@ v_mount_option.render = function(self, section, scope)
     self.template = "cbi/dvalue"
     local mp = mount_point[section].mount_options
     mount_point[section].mount_options = nil
+    local length = 0
     for k in mp:gmatch("([^,]+)") do
-      mount_point[section].mount_options = mount_point[section].mount_options and mount_point[section].mount_options .. "," or ""
-      if #mount_point[section].mount_options > 50 then mount_point[section].mount_options = mount_point[section].mount_options.. " " end
-      mount_point[section].mount_options= mount_point[section].mount_options.. k
+      mount_point[section].mount_options = mount_point[section].mount_options and (mount_point[section].mount_options .. ",") or ""
+      if length > 20 then
+        mount_point[section].mount_options = mount_point[section].mount_options.. " <br>"
+        length = 0
+      end
+      mount_point[section].mount_options = mount_point[section].mount_options .. k
+      length = length + #k
     end
+    self.rawhtml = true
     -- mount_point[section].mount_options = #mount_point[section].mount_options > 50 and mount_point[section].mount_options:sub(1,50) .. "..." or mount_point[section].mount_options
     DummyValue.render(self, section, scope)
   end
@@ -270,7 +266,7 @@ end
 if dm.command.btrfs then
   local blabel, bmembers, blevel
   tab_section.tabs.btrfs = translate("Btrfs")
-  local r = m:section(SimpleSection, translate("Btrfs Multiple Devices Creation"))
+  local r = m:section(SimpleSection, translate("Multiple Devices Btrfs Creation"))
   r.template="diskman/cbi/xnullsection"
   r.config = "btrfs"
   local btrfs_label = r:option(Value, "_blabel", translate("Btrfs Label"))
