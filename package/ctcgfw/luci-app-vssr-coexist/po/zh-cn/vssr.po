@@ -1,8 +1,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "ShadowSocksR Client"
-msgstr "ShadowSocksR 客户端"
 
 msgid "Enable"
 msgstr "启用"
@@ -10,8 +8,129 @@ msgstr "启用"
 msgid "Disable"
 msgstr "停用"
 
-msgid "Log"
-msgstr "日志"
+msgid "Enable Servers"
+msgstr "开启服务"
+
+msgid "Open v2ray split-flow"
+msgstr "开启V2ray分流"
+
+msgid "When open v2ray split-flow,your main server must be a v2ray server"
+msgstr "当使用v2ray分流功能时 主服务器必须为V2ray"
+
+msgid "Youtube Proxy"
+msgstr "Youtube 代理"
+
+msgid "TaiWan Video Proxy"
+msgstr "台湾视频服务代理"
+
+msgid "Netflix Proxy"
+msgstr "Netflix 代理"
+
+msgid "Diseny+ Proxy"
+msgstr "Diseny+ 代理"
+
+msgid "Prime Video Proxy"
+msgstr "Prime Video 代理"
+
+msgid "adblock settings"
+msgstr "广告屏蔽设置"
+
+msgid "Enable adblock"
+msgstr "开启广告屏蔽"
+
+msgid "Socks user"
+msgstr "用户名"
+
+msgid "Socks pass"
+msgstr "密码"
+
+msgid "Ping All Servers"
+msgstr "PING 所有节点"
+
+
+msgid "vssr Server"
+msgstr "vssr 服务端"
+
+msgid "SSR SOCKS5 Proxy"
+msgstr "SSR SOCKS5代理"
+
+msgid "Subscription"
+msgstr "订阅管理"
+
+msgid "Subscribing,Please do not refresh!"
+msgstr "订阅，请不要刷新!"
+
+msgid "Check Try Count"
+msgstr "切换检查重试次数"
+
+
+msgid "Node List"
+msgstr "节点列表"
+
+msgid "END SUBSCRIBE"
+msgstr "结束订阅"
+
+msgid "Update Setting"
+msgstr "更新设置"
+
+
+msgid "AlterId"
+msgstr "额外ID"
+
+msgid "Save And Start Subscribe"
+msgstr "保存并开始订阅"
+
+
+msgid "VmessId (UUID)"
+msgstr "用户ID(UUID)"
+
+msgid "Transport"
+msgstr "传输方式"
+
+msgid "Configuration Url"
+msgstr "配置链接"
+
+msgid "Import Configuration"
+msgstr "导入配置信息"
+
+msgid "Apply"
+msgstr "应用"
+
+msgid "total"
+msgstr "总计"
+
+msgid "Node list"
+msgstr "节点列表"
+
+
+msgid "Nodes"
+msgstr "个节点"
+
+msgid "Client"
+msgstr "客户端"
+
+msgid "Visit foreign websites"
+msgstr "访问国外网站"
+
+msgid "Visit domestic website"
+msgstr "访问国内网站"
+
+msgid "Problem detected"
+msgstr "无法访问"
+
+msgid "Working..."
+msgstr "连接正常"
+
+
+msgid "Game Mode"
+msgstr "游戏模式"
+
+
+msgid "V2ray SOCKS5 Proxy"
+msgstr "V2ray SOCKS5代理"
+
+msgid "Edit vssr Server"
+msgstr "编辑服务器配置"
 
 msgid "ShadowSocksR is running"
 msgstr "ShadowSocksR 客户端运行中"
@@ -166,11 +285,8 @@ msgstr "编辑服务器配置"
 msgid "Alias"
 msgstr "别名"
 
-msgid "SOCKS Proxy"
-msgstr "SOCKS(4/5)代理"
-
-msgid "Enable SOCKS Proxy"
-msgstr "启用 SOCKS 代理"
+msgid "SOCKS5 Proxy"
+msgstr "SOCKS5代理"
 
 msgid "Server"
 msgstr "服务器"
@@ -186,6 +302,9 @@ msgstr "未知"
 
 msgid "Running Status"
 msgstr "运行状态"
+
+msgid "vssr"
+msgstr "Hello World"
 
 msgid "Global Client"
 msgstr "TCP透明代理"
@@ -274,6 +393,7 @@ msgstr "正在检查.."
 msgid "Proxy Check"
 msgstr "代理检查"
 
+
 msgid "GFW List Data"
 msgstr "【GFW列表】数据库"
 
@@ -321,12 +441,6 @@ msgstr "自动切换检查周期（秒）"
 
 msgid "Check timout(second)"
 msgstr "切换检查超时时间（秒）"
-
-msgid "Check Try Count"
-msgstr "切换检查重试次数"
-
-msgid "Enable adblock"
-msgstr "启用广告屏蔽"
 
 msgid "Enable Process Deamon"
 msgstr "启用进程自动守护"
@@ -386,7 +500,7 @@ msgid "GFW List"
 msgstr "GFW列表"
 
 msgid "ShadowSocksR Plus+ Settings"
-msgstr "ShadowSocksR Plus+ 设置（支持SS/SSR/V2RAY/TROJAN）"
+msgstr "ShadowSocksR Plus+ 设置（支持SS/SSR/V2RAY）"
 
 msgid "Main Server"
 msgstr "主服务器"
@@ -416,7 +530,7 @@ msgid "Server Count"
 msgstr "服务器节点数量"
 
 msgid "IP black-and-white list"
-msgstr "黑白名单"
+msgstr "IP黑白名单"
 
 msgid "WAN IP AC"
 msgstr "WAN IP访问控制"
@@ -455,10 +569,10 @@ msgid "Please refer to the following writing"
 msgstr "每行一个域名，无需写前面的 HTTP(S):// ，提交后即时生效"
 
 msgid "Servers subscription and manage"
-msgstr "服务器节点订阅与管理（支持订阅和手动导入SSR链接）"
+msgstr "节点订阅"
 
 msgid "Through proxy update list, Not Recommended"
-msgstr "通过路由器自身代理更新订阅"
+msgstr "通过路由器自身代理更新订阅（不推荐）"
 
 msgid "LAN IP AC"
 msgstr "LAN IP访问控制"
@@ -469,23 +583,17 @@ msgstr "游戏模式UDP中继服务器"
 msgid "Game Mode UDP Relay"
 msgstr "游戏模式UDP中继"
 
-msgid "adblock settings"
-msgstr "广告屏蔽设置"
-
 msgid "Server failsafe auto swith settings"
 msgstr "服务器节点故障自动切换设置"
 
 msgid "Delete all severs"
-msgstr "删除所有服务器节点"
+msgstr "删除所有服务器"
 
 msgid "Severs Nodes"
 msgstr "服务器节点"
 
 msgid "Use Local DNS Service listen port 5335"
 msgstr "使用本机端口为5335的DNS服务"
-
-msgid "Use system DNS"
-msgstr "使用系统DNS"
 
 msgid "Server Node Type"
 msgstr "服务器节点类型"
@@ -523,50 +631,6 @@ msgstr "所有端口（默认）"
 msgid "Only Common Ports"
 msgstr "仅常用端口（不走P2P流量到代理）"
 
-msgid "Socket Connected"
-msgstr "连接测试"
 
-msgid "Ping Latency"
-msgstr "Ping延迟"
 
-msgid "Bypass Domain List"
-msgstr "不走代理的域名"
 
-msgid "Black Domain List"
-msgstr "强制走代理的域名"
-
-msgid "Update Subscribe List"
-msgstr "更新订阅URL列表"
-
-msgid "Update subscribe url list first"
-msgstr "订阅服务器节点前，请先更新订阅URL列表"
-
-msgid "Update All Subscribe Severs"
-msgstr "更新所有订阅服务器节点"
-
-msgid "Plugin"
-msgstr "插件"
-
-msgid "Plugin Opts"
-msgstr "插件参数"
-
-msgid "Self-signed Certificate"
-msgstr "自签证书"
-
-msgid "If you have a self-signed certificate,please check the box"
-msgstr "如果你使用自签证书，请选择"
-
-msgid "upload"
-msgstr "上传"
-
-msgid "Upload"
-msgstr "上传"
-
-msgid "No specify upload file."
-msgstr "没有上传证书"
-
-msgid "Current Certificate Path"
-msgstr "当前证书路径"
-
-msgid "Please confirm the current certificate path"
-msgstr "请选择确认所传证书，证书不正确将无法运行"
