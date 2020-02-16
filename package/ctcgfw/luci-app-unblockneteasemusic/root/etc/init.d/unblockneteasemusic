@@ -131,17 +131,17 @@ start()
 
 	if [ "${music_source}" = "qq" ];then
 		[ -z "${qq_cookie}" ] && { echo "QQ cookie is not exsit, please enter it before starting."; exit 1; }
-		qq_cookie_line="$(awk "/'cookie':/{print NR}" "/usr/share/unblockneteasemusic/core/provider/qq.js")"
-		sed -i "${qq_cookie_line}d" "/usr/share/unblockneteasemusic/core/provider/qq.js"
-		sed -i -e "${qq_cookie_line}i \\\t'cookie': '${qq_cookie}'" "/usr/share/unblockneteasemusic/core/provider/qq.js"
+		qq_cookie_line="$(awk "/'cookie':/{print NR}" "/usr/share/unblockneteasemusic/core/src/provider/qq.js")"
+		sed -i "${qq_cookie_line}d" "/usr/share/unblockneteasemusic/core/src/provider/qq.js"
+		sed -i -e "${qq_cookie_line}i \\\t'cookie': '${qq_cookie}'" "/usr/share/unblockneteasemusic/core/src/provider/qq.js"
 	elif [ "${music_source}" = "youtube" ];then
 		[ -z "${youtube_key}" ] && { echo "Youtube API Key is not exsit, please enter it before starting."; exit 1; }
-		sed -i '/const key = /d' "/usr/share/unblockneteasemusic/core/provider/youtube.js"
-		sed -i -e "1i const key = '${youtube_key}'" "/usr/share/unblockneteasemusic/core/provider/youtube.js"
+		sed -i '/const key = /d' "/usr/share/unblockneteasemusic/core/src/provider/youtube.js"
+		sed -i -e "1i const key = '${youtube_key}'" "/usr/share/unblockneteasemusic/core/src/provider/youtube.js"
 	fi
 
-	{ [ -f "${self_issue_cert_crt}" ] && [ "${self_issue_cert_crt}" != "/usr/share/unblockneteasemusic/core/server.crt" ]; } && ln -sf "${self_issue_cert_crt}" "/usr/share/unblockneteasemusic/core/server.crt"
-	{ [ -f "${self_issue_cert_key}" ] && [ "${self_issue_cert_key}" != "/usr/share/unblockneteasemusic/core/server.key" ]; } && ln -sf "${self_issue_cert_key}" "/usr/share/unblockneteasemusic/core/server.key"
+	{ [ -f "${self_issue_cert_crt}" ] && [ "${self_issue_cert_crt}" != "/usr/share/unblockneteasemusic/core/server.crt" ]; } && { ln -sf "${self_issue_cert_crt}" "/usr/share/unblockneteasemusic/core/server.crt"; sed -i "#${self_issue_cert_crt}#d"; echo "${self_issue_cert_crt}" >> "/etc/sysupgrade.conf"; }
+	{ [ -f "${self_issue_cert_key}" ] && [ "${self_issue_cert_key}" != "/usr/share/unblockneteasemusic/core/server.key" ]; } && { ln -sf "${self_issue_cert_key}" "/usr/share/unblockneteasemusic/core/server.key"; sed -i "#${self_issue_cert_key}#d"; echo "${self_issue_cert_key}" >> "/etc/sysupgrade.conf"; }
 
 	[ "${hijack_ways}" = "use_hosts" ] && { http_port="80"; https_port="443"; }
 	if [ "${music_source}" = "default" ]; then
@@ -172,7 +172,7 @@ stop()
 	sed -i '/unblockneteasemusic/d' "/etc/crontabs/root"
 	/etc/init.d/cron restart > "/dev/null" 2>&1
 
-	sed -i '/unblockneteasemusic/d' "/etc/sysupgrade.conf"
+	sed -i '#unblockneteasemusic/core#d' "/etc/sysupgrade.conf"
 	[ "${keep_core_when_upgrade}" -eq "1" ] && { echo "/usr/share/unblockneteasemusic/core/" >> "/etc/sysupgrade.conf"; echo "/usr/share/unblockneteasemusic/local_ver" >> "/etc/sysupgrade.conf"; }
 
 	rm -f "/tmp/unblockneteasemusic.log"
