@@ -37,21 +37,6 @@ youtube_key.description = translate("API Key申请地址：https://developers.go
 youtube_key.datatype = "string"
 youtube_key:depends("music_source", "youtube")
 
-endpoint_url = s:option(Value, "endpoint_url", translate("EndPoint"))
-endpoint_url.description = translate("具体说明参见：https://github.com/nondanee/UnblockNeteaseMusic")
-endpoint_url.default = "http://music.163.com"
-endpoint_url.placeholder = "http://music.163.com"
-endpoint_url.datatype = "string"
-endpoint_url.rmempty = false
-
-hijack = s:option(ListValue, "hijack_ways", translate("劫持方法"))
-hijack:value("dont_hijack", translate("不开启劫持"))
-hijack:value("use_ipset", translate("使用IPSet劫持"))
-hijack:value("use_hosts", translate("使用Hosts劫持"))
-hijack.description = translate("如果使用Hosts劫持，程序监听的HTTP/HTTPS端口将被锁定为80/443")
-hijack.default = "dont_hijack"
-hijack.rmempty = false
-
 auto_update = s:option(Flag, "auto_update", translate("启用自动更新"))
 auto_update.description = translate("启用后，每天将定时自动检查最新版本并更新")
 auto_update.default = 0
@@ -64,6 +49,36 @@ end
 update_time.default = "3"
 update_time.description = translate("设定每天自动检查更新时间")
 update_time:depends("auto_update", 1)
+
+daemon_enable = s:option(Flag, "daemon_enable", translate("启用进程守护"))
+daemon_enable.description = translate("开启后，附属程序会自动检测主程序运行状态，在主程序退出时自动重启")
+daemon_enable.default = 0
+daemon_enable.rmempty = false
+
+download_cert = s:option(Button,"certificate",translate("HTTPS 证书"))
+download_cert.inputtitle = translate("下载 CA 根证书")
+download_cert.description = translate("Linux/iOS/MacOSX在信任根证书后方可正常使用")
+download_cert.inputstyle = "reload"
+download_cert.write = function()
+	act_download_cert()
+end
+
+function act_download_cert()
+	local t,e
+	t=nixio.open("/usr/share/unblockneteasemusic/core/ca.crt","r")
+	luci.http.header('Content-Disposition','attachment; filename="ca.crt"')
+	luci.http.prepare_content("application/octet-stream")
+	while true do
+		e=t:read(nixio.const.buffersize)
+		if(not e)or(#e==0)then
+			break
+		else
+			luci.http.write(e)
+		end
+	end
+	t:close()
+	luci.http.close()
+end
 
 advanced_mode = s:option(Flag, "advanced_mode", translate("启用进阶设置"))
 advanced_mode.description = translate("仅推荐高级玩家使用")
@@ -84,11 +99,20 @@ https_port.default = "5201"
 https_port.datatype = "port"
 https_port:depends("advanced_mode", 1)
 
-daemon_enable = s:option(Flag, "daemon_enable", translate("启用进程守护"))
-daemon_enable.description = translate("开启后，附属程序会自动检测主程序运行状态，在主程序退出时自动重启")
-daemon_enable.default = 0
-daemon_enable.rmempty = false
-daemon_enable:depends("advanced_mode", 1)
+endpoint_url = s:option(Value, "endpoint_url", translate("EndPoint"))
+endpoint_url.description = translate("具体说明参见：https://github.com/nondanee/UnblockNeteaseMusic")
+endpoint_url.default = "http://music.163.com"
+endpoint_url.placeholder = "http://music.163.com"
+endpoint_url.datatype = "string"
+endpoint_url:depends("advanced_mode", 1)
+
+hijack = s:option(ListValue, "hijack_ways", translate("劫持方法"))
+hijack:value("dont_hijack", translate("不开启劫持"))
+hijack:value("use_ipset", translate("使用IPSet劫持"))
+hijack:value("use_hosts", translate("使用Hosts劫持"))
+hijack.description = translate("如果使用Hosts劫持，程序监听的HTTP/HTTPS端口将被锁定为80/443")
+hijack.default = "dont_hijack"
+hijack:depends("advanced_mode", 1)
 
 keep_core_when_upgrade = s:option(Flag, "keep_core_when_upgrade", translate("升级时保留核心程序"))
 keep_core_when_upgrade.description = translate("默认情况下，在OpenWrt升级后会导致核心程序丢失，开启此选项后会保留当前下载的核心程序")
