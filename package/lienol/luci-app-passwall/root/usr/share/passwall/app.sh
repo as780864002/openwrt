@@ -19,6 +19,7 @@ DNS_PORT=7913
 LUA_API_PATH=/usr/lib/lua/luci/model/cbi/$CONFIG/api
 API_GEN_V2RAY=$LUA_API_PATH/gen_v2ray_client_config.lua
 API_GEN_TROJAN=$LUA_API_PATH/gen_trojan_client_config.lua
+FWI=$(uci get firewall.passwall.path 2>/dev/null)
 
 echolog() {
 	local d="$(date "+%Y-%m-%d %H:%M:%S")"
@@ -299,24 +300,7 @@ gen_start_config() {
 		eval SOCKS5_NODE${5}_PORT=$port
 		if [ "$type" == "socks5" ]; then
 			echolog "Socks5节点不能使用Socks5代理节点！"
-		elif [ "$type" == "v2ray" ]; then
-			lua $API_GEN_V2RAY $node nil nil $local_port >$config_file
-			ln_start_bin $(config_t_get global_app v2ray_file $(find_bin v2ray))/v2ray v2ray "-config=$config_file"
-		elif [ "$type" == "v2ray_balancing" ]; then
-			local balancing_node=$(config_n_get $node v2ray_balancing_node)
-			balancing_node_address=""
-			for node_id in $balancing_node
-			do
-				local address=$(config_n_get $node_id address)
-				local port=$(config_n_get $node_id port)
-				local temp=""
-				if [ -z "$balancing_node_address" ]; then
-					temp="${address}:${port}"
-				else
-					temp="${balancing_node_address}\n${address}:${port}"
-				fi
-				balancing_node_address="$temp"
-			done
+		elif [ "$type" == "v2ray" -o "$type" == "v2ray_balancing" -o "$type" == "v2ray_shunt" ]; then
 			lua $API_GEN_V2RAY $node nil nil $local_port >$config_file
 			ln_start_bin $(config_t_get global_app v2ray_file $(find_bin v2ray))/v2ray v2ray "-config=$config_file"
 		elif [ "$type" == "trojan" ]; then
@@ -360,24 +344,7 @@ gen_start_config() {
 			# local redsocks_config_file=$CONFIG_PATH/UDP_$i.conf
 			# gen_redsocks_config $redsocks_config_file udp $port $node_address $node_port $server_username $server_password
 			# ln_start_bin $(find_bin redsocks2) redsocks2 "-c $redsocks_config_file"
-		elif [ "$type" == "v2ray" ]; then
-			lua $API_GEN_V2RAY $node udp $local_port nil >$config_file
-			ln_start_bin $(config_t_get global_app v2ray_file $(find_bin v2ray))/v2ray v2ray "-config=$config_file"
-		elif [ "$type" == "v2ray_balancing" ]; then
-			local balancing_node=$(config_n_get $node v2ray_balancing_node)
-			balancing_node_address=""
-			for node_id in $balancing_node
-			do
-				local address=$(config_n_get $node_id address)
-				local port=$(config_n_get $node_id port)
-				local temp=""
-				if [ -z "$balancing_node_address" ]; then
-					temp="${address}:${port}"
-				else
-					temp="${balancing_node_address}\n${address}:${port}"
-				fi
-				balancing_node_address="$temp"
-			done
+		elif [ "$type" == "v2ray" -o "$type" == "v2ray_balancing" -o "$type" == "v2ray_shunt" ]; then
 			lua $API_GEN_V2RAY $node udp $local_port nil >$config_file
 			ln_start_bin $(config_t_get global_app v2ray_file $(find_bin v2ray))/v2ray v2ray "-config=$config_file"
 		elif [ "$type" == "trojan" ]; then
@@ -435,24 +402,7 @@ gen_start_config() {
 			# local redsocks_config_file=$CONFIG_PATH/TCP_$i.conf
 			# gen_redsocks_config $redsocks_config_file tcp $port $node_address $socks5_port $server_username $server_password
 			# ln_start_bin $(find_bin redsocks2) redsocks2 "-c $redsocks_config_file"
-		elif [ "$type" == "v2ray" ]; then
-			lua $API_GEN_V2RAY $node tcp $local_port nil >$config_file
-			ln_start_bin $(config_t_get global_app v2ray_file $(find_bin v2ray))/v2ray v2ray "-config=$config_file"
-		elif [ "$type" == "v2ray_balancing" ]; then
-			local balancing_node=$(config_n_get $node v2ray_balancing_node)
-			balancing_node_address=""
-			for node_id in $balancing_node
-			do
-				local address=$(config_n_get $node_id address)
-				local port=$(config_n_get $node_id port)
-				local temp=""
-				if [ -z "$balancing_node_address" ]; then
-					temp="${address}:${port}"
-				else
-					temp="${balancing_node_address}\n${address}:${port}"
-				fi
-				balancing_node_address="$temp"
-			done
+		elif [ "$type" == "v2ray" -o "$type" == "v2ray_balancing" -o "$type" == "v2ray_shunt" ]; then
 			lua $API_GEN_V2RAY $node tcp $local_port nil >$config_file
 			ln_start_bin $(config_t_get global_app v2ray_file $(find_bin v2ray))/v2ray v2ray "-config=$config_file"
 		elif [ "$type" == "trojan" ]; then
@@ -584,7 +534,7 @@ start_crontab() {
 	if [ "$autoupdate" = "1" ]; then
 		local t="0 $dayupdate * * $weekupdate"
 		[ "$weekupdate" = "7" ] && t="0 $dayupdate * * *"
-		echo "$t $APP_PATH/rule_update.sh" >>/etc/crontabs/root
+		echo "$t lua $APP_PATH/rule_update.lua nil log > /dev/null 2>&1 &" >>/etc/crontabs/root
 		echolog "配置定时任务：自动更新规则。"
 	fi
 
@@ -673,6 +623,11 @@ start_dns() {
 add_dnsmasq() {
 	mkdir -p $TMP_DNSMASQ_PATH $DNSMASQ_PATH /var/dnsmasq.d
 	cat $RULE_PATH/whitelist_host | sed -e "/^$/d" | sed "s/^/ipset=&\/./g" | sed "s/$/\/&whitelist/g" | sort | awk '{if ($0!=line) print;line=$0}' > $TMP_DNSMASQ_PATH/whitelist_host.conf
+
+	local adblock=$(config_t_get global_rules adblock 0)
+	[ "$adblock" == "1" ] && {
+		[ -f "$RULE_PATH/adblock.conf" -a -s "$RULE_PATH/adblock.conf" ] && ln -s $RULE_PATH/adblock.conf $TMP_DNSMASQ_PATH/adblock.conf
+	}
 
 	[ "$DNS_MODE" != "nonuse" ] && {
 		[ -f "$RULE_PATH/blacklist_host" -a -s "$RULE_PATH/blacklist_host" ] && cat $RULE_PATH/blacklist_host | sed -e "/^$/d" | awk '{print "server=/."$1"/127.0.0.1#'$DNS_PORT'\nipset=/."$1"/blacklist"}' > $TMP_DNSMASQ_PATH/blacklist_host.conf
@@ -846,7 +801,7 @@ stop_dnsmasq() {
 	rm -rf /var/dnsmasq.d/dnsmasq-$CONFIG.conf
 	rm -rf $DNSMASQ_PATH/dnsmasq-$CONFIG.conf
 	rm -rf $TMP_DNSMASQ_PATH
-	/etc/init.d/dnsmasq reload >/dev/null 2>&1 &
+	/etc/init.d/dnsmasq restart >/dev/null 2>&1 &
 }
 
 start_haproxy() {
@@ -957,6 +912,28 @@ start_haproxy() {
 	}
 }
 
+flush_include() {
+	echo '#!/bin/sh' >$FWI
+}
+
+gen_include() {
+	flush_include
+	extract_rules() {
+		echo "*$1"
+		iptables-save -t $1 | grep PSW | \
+		sed -e "s/^-A \(OUTPUT\|PREROUTING\)/-I \1 1/"
+		echo 'COMMIT'
+	}
+	cat <<-EOF >>$FWI
+		iptables-save -c | grep -v "PSW" | iptables-restore -c
+		iptables-restore -n <<-EOT
+		$(extract_rules nat)
+		$(extract_rules mangle)
+		EOT
+	EOF
+	return 0
+}
+
 kill_all() {
 	kill -9 $(pidof $@) >/dev/null 2>&1 &
 }
@@ -990,8 +967,9 @@ start() {
 	start_dns
 	add_dnsmasq
 	source $APP_PATH/iptables.sh start
+	gen_include
 	start_crontab
-	/etc/init.d/dnsmasq reload >/dev/null 2>&1 &
+	/etc/init.d/dnsmasq restart >/dev/null 2>&1 &
 	echolog "运行完成！\n"
 	rm -f "$LOCK_FILE"
 	return 0
@@ -1010,6 +988,7 @@ stop() {
 	done
 	clean_log
 	source $APP_PATH/iptables.sh stop
+	flush_include
 	kill_all v2ray-plugin obfs-local
 	ps -w | grep -E "$CONFIG_PATH" | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
 	rm -rf $TMP_DNSMASQ_PATH $CONFIG_PATH
