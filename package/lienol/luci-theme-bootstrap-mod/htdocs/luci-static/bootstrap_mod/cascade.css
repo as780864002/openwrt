@@ -15,7 +15,7 @@ body {
 }
 
 a {
-    color: #118af3;
+    color: #0069d6;
     text-decoration: none;
     outline: 0;
 }
@@ -33,7 +33,7 @@ h6,
 p,
 .cbi-map-descr,
 .cbi-section-descr {
-    color: #19a4e6;
+    color: #404040;
     margin-top: 0;
     margin-bottom: 10px;
 }
@@ -51,7 +51,7 @@ tr,
 }
 
 legend {
-    color: #19a4e6;
+    color: #404040;
     font-size: 18px;
     font-weight: bold;
     padding: 0 0 3px;
@@ -117,10 +117,10 @@ header {
     top: 0;
     left: 0;
     right: 0;
-    background: #34aee8;
+    background: #222;
     box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
     z-index: 100;
-    border-bottom: 2px solid #19a4e6;
+    border-bottom: 2px solid #ccc;
 }
 
 .brand {
@@ -163,7 +163,7 @@ header {
 }
 
 .dropdown:hover {
-    background-color: #0088cc;
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .dropdown:hover .dropdown-menu {
@@ -174,7 +174,7 @@ header {
     display: none;
     position: absolute;
     top: 40px;
-    background: #34aee8;
+    background: #222;
     border-radius: 5px;
     padding: 5px 0px;
     z-index: 100;
@@ -185,13 +185,13 @@ header {
     position: absolute;
     top: -6px;
     left: 27px;
-    border-bottom: 6px solid #00aaff;
+    border-bottom: 6px solid white;
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
 }
 
 .dropdown-menu a {
-    color: #fff;
+    color: #999;
     line-height: 30px;
     min-width: 150px;
     padding: 0 20px;
@@ -199,8 +199,8 @@ header {
 }
 
 .dropdown-menu a:hover {
-    background: #118af3;
-    /* color: #3fc3ef; */
+    background: #191919;
+    color: #fff;
 }
 
 .cbi-dropdown {
@@ -391,26 +391,24 @@ header {
 /* Label */
 
 .label {
-    border-radius: 10px !important;
     display: inline-block;
     background: #bbb;
-    border-bottom: 2px solid rgba(0, 0, 0, .05);
     border-radius: 4px;
     color: #fff;
     font-size: 14px;
     line-height: 24px;
     text-transform: uppercase;
     margin-top: 6px;
-    padding: 2px 9px;
+    padding: 1px 9px;
     cursor: pointer;
 }
 
 .label.success {
-    background: #118af3;
+    background: #46a546;
 }
 
 .label.notice {
-    background: #118af3;
+    background: #46a546;
 }
 
 .label.important {
@@ -550,7 +548,7 @@ p {
 
 .tabs,
 .cbi-tabmenu {
-    border-bottom: 1.5px solid #34aee8;
+    border-bottom: 1.5px solid #ddd;
     margin-bottom: 20px;
 }
 
@@ -562,7 +560,7 @@ p {
 .tabs a,
 .cbi-tabmenu a {
     display: block;
-    color: #19a4e6;
+    color: #404040;
     line-height: 34px;
     margin-bottom: -2px;
     margin-right: 20px;
@@ -781,7 +779,6 @@ tr tr {
 #conns>div>div,
 #swaptotal>div>div,
 #swapfree>div>div {
-    background: #00adff7a !important;
     height: 18px !important;
     border-radius: 3px;
 }
@@ -795,7 +792,7 @@ select {
     display: inline-block;
     width: 16em;
     padding: 0.4em;
-    border: 1px solid #118af3;
+    border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
     color: #111;
@@ -821,7 +818,7 @@ table.cbi-section-table select,
 input:active,
 input:focus {
     outline: 0;
-    border-color: #118af3;
+    border-color: #0069d6;
 }
 
 input[type=file]:focus,
@@ -906,7 +903,7 @@ button {
     border-radius: 6px !important;
     display: inline-block;
     background: #fff;
-    border: 1px solid #118af3;
+    border: 1px solid #ccc;
     border-radius: 2px;
     box-shadow: 0 2px 2px rgba(0, 0, 0, .05);
     color: #333;
@@ -938,8 +935,8 @@ button:focus {
 
 .cbi-button-add,
 .cbi-input-add {
-    background: #19a4e6;
-    border-color: #19a4e6;
+    background: #404040;
+    border-color: #404040;
     color: #fff;
 }
 
@@ -947,16 +944,15 @@ button:focus {
 .cbi-button-add:focus,
 .cbi-input-add:active,
 .cbi-input-add:focus {
-    border-color: #19a4e6;
+    border-color: #404040;
     opacity: .8;
 }
 
 .cbi-button-remove,
 .cbi-input-remove,
 .cbi-section-remove input {
-    background: #c00;
-    border-color: #c00;
-    color: #fff;
+    border-color: #c44;
+    color: #c44;
 }
 
 .cbi-button-remove:active,
@@ -1016,9 +1012,8 @@ button:focus {
 
 .cbi-button-apply,
 .cbi-input-apply {
-    background: rgb(0, 171, 232);
-    border-color: rgb(0, 171, 232);
-    color: #fff;
+    border-color: #0069d6;
+    color: #0069d6;
 }
 
 .cbi-button-apply:active,
@@ -1077,7 +1072,7 @@ button:focus {
 }
 
 .ifacebox .ifacebox-head.active {
-    background: #85d8ff;
+    background: #90c0e0;
 }
 
 .ifacebox .ifacebox-body {
@@ -1230,7 +1225,7 @@ button:focus {
 /* Footer */
 
 footer {
-    border-top: 1px solid #34aee8;
+    border-top: 1px solid #ddd;
     color: #111;
     text-align: center;
     padding: 10px 0;
@@ -1238,13 +1233,8 @@ footer {
 }
 
 footer a {
-    color: #118af3;
+    color: #0069d6;
 }
-
-footer a:hover {
-    color: #fff;
-}
-
 
 /* diy */
 
@@ -1300,7 +1290,7 @@ body.node-main-login .alert-message {
     text-indent: -500px;
     overflow: hidden;
     border-radius: 60px;
-    /* border: #118af3 3px solid; */
+    /* border: #0069d6 3px solid; */
     background-image: url(wifi.png);
     background-size: cover;
     /* box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(156, 39, 176, 0.4); */
@@ -1436,7 +1426,7 @@ body.modal-overlay-active #modal_overlay>.modal {
     max-width: 400px;
     width: auto;
     background: white;
-    border: 1px solid #118af3;
+    border: 1px solid #0069d6;
     border-radius: 5px;
     box-sizing: border-box;
     padding: 0.3em !important;
@@ -1446,7 +1436,7 @@ body.modal-overlay-active #modal_overlay>.modal {
     margin-bottom: 4px;
     box-shadow: 0 0 2px #ccc;
     background: #fff;
-    border: 1px solid #118af3;
+    border: 1px solid #0069d6;
     border-radius: 3px;
     position: relative;
     pointer-events: none;
@@ -1499,8 +1489,8 @@ body.modal-overlay-active #modal_overlay>.modal {
 .cbi-page-actions .cbi-button-apply,
 .cbi-section-actions .cbi-button-edit {
     color: #fff;
-    background: #118af3;
-    border: 1px solid #118af3;
+    background: #0069d6;
+    border: 1px solid #0069d6;
 }
 
 .cbi-dropdown {
@@ -1522,7 +1512,7 @@ body.modal-overlay-active #modal_overlay>.modal {
 }
 
 .cbi-progressbar>div {
-    background: #85d8ff;
+    background: #90c0e0;
     height: 100%;
     transition: width .25s ease-in;
     width: 0%;
