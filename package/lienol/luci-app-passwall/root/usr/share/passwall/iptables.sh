@@ -155,7 +155,7 @@ load_acl() {
 							fi
 						}
 						[ "$UDP_NODE" != "nil" ] && {
-							[ "$UDP_NO_REDIR_PORTS" != "disable" ] && $ipt_m -A PSW_ACL $(factor $ip "-s") $(factor $mac "-m mac --mac-source") -p udp -m multiport --dport $udp_no_redir_ports -j RETURN
+							[ "$udp_no_redir_ports" != "disable" ] && $ipt_m -A PSW_ACL $(factor $ip "-s") $(factor $mac "-m mac --mac-source") -p udp -m multiport --dport $udp_no_redir_ports -j RETURN
 							eval udp_redir_port=\$UDP_REDIR_PORT$udp_node
 							$ipt_m -A PSW_ACL $(factor $ip "-s") $(factor $mac "-m mac --mac-source") -p udp $(factor $udp_redir_ports "-m multiport --dport") $(comment "$remarks") -$(get_jump_mode $proxy_mode) $(get_action_chain $proxy_mode)$udp_node
 							$ipt_m -A PSW_ACL $(factor $ip "-s") $(factor $mac "-m mac --mac-source") -p udp $(comment "$remarks") -j RETURN
@@ -202,11 +202,12 @@ filter_vpsip() {
 							local top_host=$(echo ${server%.*} | awk -F '.' '{print $NF}')
 							[ "$suffix" == "$top_host" ] && continue
 							[ -n "$suffix" -a -n "$top_host" ] && tmp="$top_host.$suffix"
-							is_gfwlist=$(cat $TMP_DNSMASQ_PATH/gfwlist.conf | grep -c "$tmp")
-							[ "$is_gfwlist" == 0 ] && {
+							[ "tmp" == "google.com" ] && continue
+							#is_gfwlist=$(cat $TMP_DNSMASQ_PATH/gfwlist.conf | grep -c "$tmp")
+							#[ "$is_gfwlist" == 0 ] && {
 								has=$([ -f "$TMP_DNSMASQ_PATH/vpsiplist_host.conf" ] && cat $TMP_DNSMASQ_PATH/vpsiplist_host.conf | grep "$server")
 								[ -z "$has" ] && echo "$server" | sed -e "/^$/d" | sed "s/^/ipset=&\//g" | sed "s/$/\/&vpsiplist/g" | sort | awk '{if ($0!=line) print;line=$0}' >> $TMP_DNSMASQ_PATH/vpsiplist_host.conf
-							}
+							#}
 						fi
 					}
 				}
