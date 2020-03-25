@@ -23,11 +23,11 @@ Signed-off-by: Jo-Philipp Wich <jo@mein.io>
 --- a/blobmsg.c
 +++ b/blobmsg.c
 @@ -120,7 +120,7 @@ bool blobmsg_check_attr_len(const struct
-
+ 
  int blobmsg_check_array(const struct blob_attr *attr, int type)
  {
 -	return blobmsg_check_array_len(attr, type, blobmsg_len(attr));
 +	return blobmsg_check_array_len(attr, type, blob_len(attr));
  }
-
+ 
  int blobmsg_check_array_len(const struct blob_attr *attr, int type, size_t len)
